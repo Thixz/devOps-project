@@ -46,20 +46,13 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
 
-    #- name: Login into the container registry
-      #uses: docker/login-action@v3
-      #with:
-        #username: ${{ secrets.DOCKERHUB_USERNAME }}
-        #password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-    #- name: Build and Push
-      #uses: docker/build-push-action@v5
-      #with:
-        #push: true
-        #tags: thixz/rocketseat-ci-api:${{steps.generate_tag.outputs.sha}}, thixz/rocketseat-ci-api:latest
-
-    #- name: Build docker image
-      #run: docker build -t thixz/rocketseat-ci-api:${{steps.generate_tag.outputs.sha}} . # Recuperando a variável do step anterior
+    - name: Build docker image
+      env:
+        REGISTRY: ${{steps.login-ecr.outputs.registry}}
+        TAG: ${{steps.generate_tag.outputs.sha}}
+      run: |
+        docker build -t $REGISTRY/rocketseat-ci:TAG . # Recuperando a variável do step anterior
+        docker push $REGISTRY/rocketseat-ci:TAG
 
     #- name: Push Image to docker
       #run: docker push thixz/rocketseat-ci-api:${{steps.generate_tag.outputs.sha}}
